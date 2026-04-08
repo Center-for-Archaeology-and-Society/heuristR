@@ -2,6 +2,20 @@
 
 `heuristR` is an R client for Heurist databases with a session-oriented API.
 
+## What Is Heurist?
+
+[Heurist](https://heuristnetwork.org/) is a web-based database platform built
+for research projects that need flexible, relational data structures without a
+custom application build. The public Heurist startup page describes it as a
+system designed by researchers for collecting, managing, analysing,
+visualising, exporting, publishing, and archiving information.
+
+For hosted use, the public Huma-Num server currently provides a database
+creation flow at [heurist.huma-num.fr/heurist/startup/](https://heurist.huma-num.fr/heurist/startup/).
+Based on that page, new users can register there and create their first
+database on the server, while existing users can create additional databases
+through the administration interface after logging in.
+
 It provides:
 
 - session and authentication helpers
@@ -16,6 +30,19 @@ It provides:
 ```r
 devtools::load_all("heuristR")
 ```
+
+## Create Your Own Heurist Database
+
+The easiest public starting point appears to be the Huma-Num hosted service:
+
+1. Visit [heurist.huma-num.fr/heurist/startup/](https://heurist.huma-num.fr/heurist/startup/).
+2. Register as a new user, or log in if you already have an account on that server.
+3. Create a database name through the startup form.
+4. Open the new database and begin defining record types and fields in the Design menu.
+
+This README is based on the public startup flow available on April 8, 2026. If
+that hosted registration path changes, check the main
+[Heurist Network website](https://heuristnetwork.org/) for the current guidance.
 
 ## Local Configuration
 

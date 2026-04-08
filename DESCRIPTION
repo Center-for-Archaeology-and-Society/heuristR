@@ -14,8 +14,10 @@ Description: Provides a session-oriented R client for working with Heurist
     retrieval endpoints and establishes a foundation for safe record creation
     and update workflows.
 License: MIT + file LICENSE
-URL: https://heurist.huma-num.fr/heurist/
-BugReports: https://heurist.huma-num.fr/heurist/
+URL: https://github.com/Center-for-Archaeology-and-Society/heuristR,
+    https://heuristnetwork.org/,
+    https://heurist.huma-num.fr/heurist/startup/
+BugReports: https://github.com/Center-for-Archaeology-and-Society/heuristR/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
@@ -24,7 +26,10 @@ Imports:
     httr2,
     jsonlite
 Suggests:
+    knitr,
     pkgload,
     processx,
+    rmarkdown,
     testthat (>= 3.0.0)
+VignetteBuilder: knitr
 Config/testthat/edition: 3

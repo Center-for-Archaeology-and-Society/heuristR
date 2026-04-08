@@ -14,8 +14,10 @@ destructive partial save calls.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://heurist.huma-num.fr/heurist/}
-  \item Report bugs at \url{https://heurist.huma-num.fr/heurist/}
+  \item \url{https://github.com/Center-for-Archaeology-and-Society/heuristR}
+  \item \url{https://heuristnetwork.org/}
+  \item \url{https://heurist.huma-num.fr/heurist/startup/}
+  \item Report bugs at \url{https://github.com/Center-for-Archaeology-and-Society/heuristR/issues}
 }
 
 }
