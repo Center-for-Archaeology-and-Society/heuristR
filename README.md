@@ -12,9 +12,9 @@ visualising, exporting, publishing, and archiving information.
 
 For hosted use, the public Huma-Num server currently provides a database
 creation flow at [heurist.huma-num.fr/heurist/startup/](https://heurist.huma-num.fr/heurist/startup/).
-Based on that page, new users can register there and create their first
-database on the server, while existing users can create additional databases
-through the administration interface after logging in.
+New users can register there and create a first database on the server, while
+existing users can create additional databases through the administration
+interface after logging in.
 
 It provides:
 
@@ -40,9 +40,9 @@ The easiest public starting point appears to be the Huma-Num hosted service:
 3. Create a database name through the startup form.
 4. Open the new database and begin defining record types and fields in the Design menu.
 
-This README is based on the public startup flow available on April 8, 2026. If
-that hosted registration path changes, check the main
-[Heurist Network website](https://heuristnetwork.org/) for the current guidance.
+The hosted registration workflow referenced here was verified against the
+public startup page on April 8, 2026. If that path changes, consult the main
+[Heurist Network website](https://heuristnetwork.org/) for current guidance.
 
 ## Local Configuration
 
