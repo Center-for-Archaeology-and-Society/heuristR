@@ -2,6 +2,8 @@
 
 `heuristR` is an R client for Heurist databases with a session-oriented API.
 
+Documentation website: <https://center-for-archaeology-and-society.github.io/heuristR/>
+
 ## What Is Heurist?
 
 [Heurist](https://heuristnetwork.org/) is a web-based database platform built
