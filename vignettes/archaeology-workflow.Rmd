@@ -1,8 +1,10 @@
 ---
-title: "Archaeological Workflow with heuristR"
-output: rmarkdown::html_vignette
+title: "Research Workflow Example: Archaeology"
+output:
+  rmarkdown::html_vignette: default
+  rmarkdown::pdf_document: default
 vignette: >
-  %\VignetteIndexEntry{Archaeological Workflow with heuristR}
+  %\VignetteIndexEntry{Research Workflow Example: Archaeology}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[UTF-8]{inputenc}
 ---
@@ -17,6 +19,12 @@ knitr::opts_chunk$set(
 `heuristR` is designed to make Heurist scripting safer and easier, especially
 for repeatable research tasks where you want programmatic access to records,
 metadata, and controlled write operations.
+
+The package is intended for any researcher working with Heurist, including
+archaeologists, historians, humanists, museum professionals, and other teams
+managing relational research data. The example in this vignette follows an
+archaeological workflow because it is concrete and easy to visualize, but the
+same patterns apply to other domains.
 
 This vignette uses a completely fictional archaeology database called
 `demo_desert_survey`. The URLs, database name, user accounts, and record IDs

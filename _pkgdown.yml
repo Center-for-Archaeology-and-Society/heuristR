@@ -1,0 +1,67 @@
+url: https://center-for-archaeology-and-society.github.io/heuristR/
+template:
+  bootstrap: 5
+
+home:
+  title: heuristR
+  description: An R client for working with Heurist databases.
+
+navbar:
+  structure:
+    left: [home, reference, articles, news]
+    right: [github]
+  components:
+    home:
+      text: Home
+      href: index.html
+    reference:
+      text: Function Reference
+      href: reference/index.html
+    articles:
+      text: Vignettes
+      menu:
+      - text: Research Workflow Example
+        href: articles/archaeology-workflow.html
+      - text: Vignette PDF
+        href: articles/archaeology-workflow.pdf
+    news:
+      text: Release Notes
+      href: news/index.html
+    github:
+      icon: fab fa-github
+      aria-label: GitHub repository
+      href: https://github.com/Center-for-Archaeology-and-Society/heuristR
+
+reference:
+- title: Session and Authentication
+  contents:
+  - heurist_session
+  - heurist_login
+  - heurist_logout
+- title: Metadata
+  contents:
+  - heurist_rectypes
+  - heurist_fields
+  - heurist_structure
+  - heurist_raw_entity
+- title: Records
+  contents:
+  - heurist_get_record
+  - heurist_find_records
+  - heurist_raw_record_output
+  - heurist_raw_record_edit
+- title: Safe Writes and Rollback
+  contents:
+  - heurist_create_record
+  - heurist_replace_record
+  - heurist_patch_record
+  - heurist_link_record
+  - heurist_restore_change
+  - heurist_rollback
+  - heurist_rollback_change
+
+articles:
+- title: Workflow Guides
+  navbar: Workflow Guides
+  contents:
+  - archaeology-workflow

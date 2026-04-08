@@ -1,6 +1,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.build/
 .Renviron
 .Renviron.local
 .Rproj.user/

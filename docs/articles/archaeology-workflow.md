@@ -1,0 +1,209 @@
+# Research Workflow Example: Archaeology
+
+`heuristR` is designed to make Heurist scripting safer and easier,
+especially for repeatable research tasks where you want programmatic
+access to records, metadata, and controlled write operations.
+
+The package is intended for any researcher working with Heurist,
+including archaeologists, historians, humanists, museum professionals,
+and other teams managing relational research data. The example in this
+vignette follows an archaeological workflow because it is concrete and
+easy to visualize, but the same patterns apply to other domains.
+
+This vignette uses a completely fictional archaeology database called
+`demo_desert_survey`. The URLs, database name, user accounts, and record
+IDs below are examples only.
+
+## Example project
+
+Imagine a regional archaeology project recording:
+
+- sites
+- projectile points
+- ceramic sherd lots
+- survey units
+- places
+- people and organizations
+
+In Heurist, those concepts would usually be modeled as record types
+connected by resource pointer fields. `heuristR` lets you inspect that
+structure, query records, and perform safe read-modify-write updates
+from R.
+
+## Connect to a database
+
+Start by creating a session and logging in.
+
+``` r
+library(heuristR)
+
+session <- heurist_session(
+  base_url = "https://heurist.example.org/heurist",
+  database = "demo_desert_survey"
+)
+
+session <- heurist_login(
+  session,
+  username = "field_director",
+  password = Sys.getenv("HEURIST_PASSWORD")
+)
+```
+
+For local development, it is usually best to keep credentials in a
+project `.Renviron` file rather than in scripts.
+
+## Inspect record types and fields
+
+Before writing any automation, inspect the database structure.
+
+``` r
+rectypes <- heurist_rectypes(session)
+fields <- heurist_fields(session)
+structure <- heurist_structure(session)
+```
+
+For an archaeology database, you might expect record types such as
+`Site`, `Projectile point`, `Survey Unit`, and `Place`, with fields for
+chronology, material, geometry, site number, and linked records.
+
+## Fetch records
+
+You can retrieve a single record by ID:
+
+``` r
+site_42 <- heurist_get_record(session, 42)
+```
+
+You can also query a set of records using Heurist’s query syntax:
+
+``` r
+late_sites <- heurist_find_records(
+  session,
+  q = 't:Site "Late Archaic" sortby:-m'
+)
+```
+
+That is useful for reports such as:
+
+- all sites updated this week
+- all projectile points linked to a specific site
+- all places within a survey zone
+
+## Create a new record
+
+Suppose the crew identifies a new locality named `North Ridge Wash`.
+
+``` r
+change_create <- heurist_create_record(
+  session,
+  rectype = "Place",
+  details = list(
+    "1" = list("0" = "North Ridge Wash")
+  )
+)
+
+new_place_id <- change_create$record_id
+```
+
+[`heurist_create_record()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_create_record.md)
+returns a `heurist_change` object. That means the operation can be
+rolled back later if this was a test or an accidental insert.
+
+## Safely update an existing record
+
+Heurist write endpoints can be destructive if you send incomplete
+payloads directly.
+[`heurist_patch_record()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_patch_record.md)
+avoids that by:
+
+1.  reading the current record
+2.  merging your requested change in R
+3.  sending a full replacement payload back to Heurist
+
+Example:
+
+``` r
+change_patch <- heurist_patch_record(
+  session,
+  record_id = 42,
+  details = list(
+    "1" = list("0" = "North Ridge Site"),
+    "1108" = list("0" = new_place_id)
+  ),
+  mode = "replace"
+)
+```
+
+In an archaeological workflow, this is the safer way to add a linked
+`Place`, correct a site title, or add a newly assigned field identifier
+while preserving all unrelated data already stored on the record.
+
+## Link related records
+
+If you already know the target field and record IDs,
+[`heurist_link_record()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_link_record.md)
+provides a clearer helper for resource pointers.
+
+``` r
+change_link <- heurist_link_record(
+  session,
+  record_id = 108,
+  field_id = 1108,
+  target_record_id = 42
+)
+```
+
+That pattern fits common archaeological relationships such as:
+
+- linking a projectile point to a site
+- linking a survey unit to a place
+- linking an artifact lot to a repository or collection
+
+## Roll back a scripted change
+
+Every high-level write helper returns enough information to undo the
+change.
+
+``` r
+heurist_rollback(change_patch)
+heurist_rollback(change_link)
+heurist_rollback(change_create)
+```
+
+Rollback is especially useful when you are:
+
+- testing a migration script
+- prototyping a batch cleanup
+- validating field mappings on a staging database
+
+## Low-level endpoints for advanced workflows
+
+The package also exposes low-level wrappers when you need raw access:
+
+``` r
+raw_read <- heurist_raw_record_output(session, list(q = "t:Site"))
+raw_edit <- heurist_raw_record_edit(session, list(a = "delete", ids = "9999"))
+raw_meta <- heurist_raw_entity(session, list(a = "structure", entity = "all"))
+```
+
+These are useful for debugging or for building new helpers, but the
+high-level functions are a better default for most research scripts.
+
+## Suggested workflow for archaeology teams
+
+For repeatable project work, a good pattern is:
+
+1.  define credentials in `.Renviron`
+2.  inspect structure with
+    [`heurist_rectypes()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_rectypes.md)
+    and
+    [`heurist_fields()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_fields.md)
+3.  prototype reads with
+    [`heurist_find_records()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_find_records.md)
+4.  perform updates with
+    [`heurist_patch_record()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_patch_record.md)
+5.  keep the returned `heurist_change` objects until the script is
+    validated
+
+That approach gives you a much safer path for maintaining site,
+artifact, and place data in Heurist from R.

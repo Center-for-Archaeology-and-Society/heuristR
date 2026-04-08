@@ -14,7 +14,8 @@ Description: Provides a session-oriented R client for working with Heurist
     retrieval endpoints and establishes a foundation for safe record creation
     and update workflows.
 License: MIT + file LICENSE
-URL: https://github.com/Center-for-Archaeology-and-Society/heuristR,
+URL: https://center-for-archaeology-and-society.github.io/heuristR/,
+    https://github.com/Center-for-Archaeology-and-Society/heuristR,
     https://heuristnetwork.org/,
     https://heurist.huma-num.fr/heurist/startup/
 BugReports: https://github.com/Center-for-Archaeology-and-Society/heuristR/issues
@@ -27,6 +28,7 @@ Imports:
     jsonlite
 Suggests:
     knitr,
+    pkgdown,
     pkgload,
     processx,
     rmarkdown,
