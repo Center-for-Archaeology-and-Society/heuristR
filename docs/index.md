@@ -3,6 +3,17 @@
 `heuristR` is an R client for Heurist databases with a session-oriented
 API.
 
+Documentation website:
+<https://center-for-archaeology-and-society.github.io/heuristR/>
+
+## Overview
+
+`heuristR` provides a practical R interface for working with Heurist
+databases from scripts, analysis workflows, and repeatable
+data-management tasks. It is designed to make authentication, metadata
+inspection, record retrieval, and safe scripted updates easier to manage
+from R.
+
 ## What Is Heurist?
 
 [Heurist](https://heuristnetwork.org/) is a web-based database platform
@@ -19,7 +30,9 @@ New users can register there and create a first database on the server,
 while existing users can create additional databases through the
 administration interface after logging in.
 
-It provides:
+## What heuristR Provides
+
+The package includes:
 
 - session and authentication helpers
 - metadata access for record types, fields, and structure
@@ -28,7 +41,18 @@ It provides:
 - safe write helpers built around read-modify-write
 - rollback helpers for reversible scripted changes
 
-## Install During Development
+## Installation
+
+Install the development version from GitHub with `remotes` or `pak`, or
+load it locally when working from a checkout.
+
+From GitHub:
+
+``` r
+remotes::install_github("Center-for-Archaeology-and-Society/heuristR")
+```
+
+During development from a local checkout:
 
 ``` r
 devtools::load_all("heuristR")
@@ -76,7 +100,9 @@ HEURIST_PASSWORD=your_password
 When you run R from the package directory, `heuristR`’s live tests will
 pick up that local `.Renviron` automatically.
 
-## Quick Start
+## Basic Workflow
+
+A typical `heuristR` session looks like this:
 
 ``` r
 library(heuristR)
@@ -95,6 +121,14 @@ session <- heurist_login(
 rectypes <- heurist_rectypes(session)
 record <- heurist_get_record(session, 3)
 ```
+
+From there you can inspect structure with
+[`heurist_fields()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_fields.md)
+and
+[`heurist_structure()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_structure.md),
+search records with
+[`heurist_find_records()`](https://center-for-archaeology-and-society.github.io/heuristR/reference/heurist_find_records.md),
+and use the higher-level write helpers when you need controlled updates.
 
 ## Safe Writes
 
@@ -121,7 +155,18 @@ change <- heurist_patch_record(
 heurist_rollback(change)
 ```
 
-## Status
+## Documentation
+
+Additional package documentation is available here:
+
+- GitHub Pages site:
+  <https://center-for-archaeology-and-society.github.io/heuristR/>
+- Function reference:
+  <https://center-for-archaeology-and-society.github.io/heuristR/reference/>
+- Workflow vignette:
+  <https://center-for-archaeology-and-society.github.io/heuristR/articles/archaeology-workflow.html>
+
+## Project Status
 
 The package includes permanent unit and live integration tests covering:
 

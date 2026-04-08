@@ -55,12 +55,22 @@
 <div class="page-header"><h1 id="heuristr">heuristR<a class="anchor" aria-label="anchor" href="#heuristr"></a>
 </h1></div>
 <p><code>heuristR</code> is an R client for Heurist databases with a session-oriented API.</p>
+<p>Documentation website: <a href="https://center-for-archaeology-and-society.github.io/heuristR/" class="uri">https://center-for-archaeology-and-society.github.io/heuristR/</a></p>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p><code>heuristR</code> provides a practical R interface for working with Heurist databases from scripts, analysis workflows, and repeatable data-management tasks. It is designed to make authentication, metadata inspection, record retrieval, and safe scripted updates easier to manage from R.</p>
+</div>
 <div class="section level2">
 <h2 id="what-is-heurist">What Is Heurist?<a class="anchor" aria-label="anchor" href="#what-is-heurist"></a>
 </h2>
 <p><a href="https://heuristnetwork.org/" class="external-link">Heurist</a> is a web-based database platform built for research projects that need flexible, relational data structures without a custom application build. The public Heurist startup page describes it as a system designed by researchers for collecting, managing, analysing, visualising, exporting, publishing, and archiving information.</p>
 <p>For hosted use, the public Huma-Num server currently provides a database creation flow at <a href="https://heurist.huma-num.fr/heurist/startup/" class="external-link">heurist.huma-num.fr/heurist/startup/</a>. New users can register there and create a first database on the server, while existing users can create additional databases through the administration interface after logging in.</p>
-<p>It provides:</p>
+</div>
+<div class="section level2">
+<h2 id="what-heuristr-provides">What heuristR Provides<a class="anchor" aria-label="anchor" href="#what-heuristr-provides"></a>
+</h2>
+<p>The package includes:</p>
 <ul>
 <li>session and authentication helpers</li>
 <li>metadata access for record types, fields, and structure</li>
@@ -71,9 +81,14 @@
 </ul>
 </div>
 <div class="section level2">
-<h2 id="install-during-development">Install During Development<a class="anchor" aria-label="anchor" href="#install-during-development"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<p>Install the development version from GitHub with <code>remotes</code> or <code>pak</code>, or load it locally when working from a checkout.</p>
+<p>From GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Center-for-Archaeology-and-Society/heuristR"</span><span class="op">)</span></span></code></pre></div>
+<p>During development from a local checkout:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">load_all</a></span><span class="op">(</span><span class="st">"heuristR"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -93,18 +108,19 @@
 </h2>
 <p>For local development and live integration tests, create a <code>.Renviron</code> file in the project root. The real <code>.Renviron</code> is ignored by git; only <code>.Renviron.example</code> should be committed.</p>
 <p>Example:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">cp</span> .Renviron.example .Renviron</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">cp</span> .Renviron.example .Renviron</span></code></pre></div>
 <p>Then edit <code>.Renviron</code> with your own values:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="va">HEURISTR_TEST_BASE_URL</span><span class="op">=</span>https://your-heurist-host.example/heurist</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="va">HEURISTR_TEST_DB</span><span class="op">=</span>your_database_name</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="va">HEURIST_USERNAME</span><span class="op">=</span>your_username</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="va">HEURIST_PASSWORD</span><span class="op">=</span>your_password</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="va">HEURISTR_TEST_BASE_URL</span><span class="op">=</span>https://your-heurist-host.example/heurist</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="va">HEURISTR_TEST_DB</span><span class="op">=</span>your_database_name</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="va">HEURIST_USERNAME</span><span class="op">=</span>your_username</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="va">HEURIST_PASSWORD</span><span class="op">=</span>your_password</span></code></pre></div>
 <p>When you run R from the package directory, <code>heuristR</code>’s live tests will pick up that local <code>.Renviron</code> automatically.</p>
 </div>
 <div class="section level2">
-<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+<h2 id="basic-workflow">Basic Workflow<a class="anchor" aria-label="anchor" href="#basic-workflow"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>A typical <code>heuristR</code> session looks like this:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Center-for-Archaeology-and-Society/heuristR" class="external-link">heuristR</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">session</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_session.html">heurist_session</a></span><span class="op">(</span></span>
@@ -120,13 +136,14 @@
 <span></span>
 <span><span class="va">rectypes</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_rectypes.html">heurist_rectypes</a></span><span class="op">(</span><span class="va">session</span><span class="op">)</span></span>
 <span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_get_record.html">heurist_get_record</a></span><span class="op">(</span><span class="va">session</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<p>From there you can inspect structure with <code><a href="reference/heurist_fields.html">heurist_fields()</a></code> and <code><a href="reference/heurist_structure.html">heurist_structure()</a></code>, search records with <code><a href="reference/heurist_find_records.html">heurist_find_records()</a></code>, and use the higher-level write helpers when you need controlled updates.</p>
 </div>
 <div class="section level2">
 <h2 id="safe-writes">Safe Writes<a class="anchor" aria-label="anchor" href="#safe-writes"></a>
 </h2>
 <p><code>heuristR</code> avoids partial destructive saves by default. High-level helpers such as <code><a href="reference/heurist_patch_record.html">heurist_patch_record()</a></code> fetch the current record, merge the requested changes client-side, and send back a full record payload.</p>
 <p>Each write returns a <code>heurist_change</code> object that can be rolled back with <code><a href="reference/heurist_restore_change.html">heurist_restore_change()</a></code> or <code><a href="reference/heurist_rollback.html">heurist_rollback()</a></code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">change</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_patch_record.html">heurist_patch_record</a></span><span class="op">(</span></span>
 <span>  <span class="va">session</span>,</span>
 <span>  record_id <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -137,7 +154,20 @@
 <span><span class="fu"><a href="reference/heurist_rollback.html">heurist_rollback</a></span><span class="op">(</span><span class="va">change</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="status">Status<a class="anchor" aria-label="anchor" href="#status"></a>
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<p>Additional package documentation is available here:</p>
+<ul>
+<li>GitHub Pages site: <a href="https://center-for-archaeology-and-society.github.io/heuristR/" class="uri">https://center-for-archaeology-and-society.github.io/heuristR/</a>
+</li>
+<li>Function reference: <a href="https://center-for-archaeology-and-society.github.io/heuristR/reference/" class="uri">https://center-for-archaeology-and-society.github.io/heuristR/reference/</a>
+</li>
+<li>Workflow vignette: <a href="https://center-for-archaeology-and-society.github.io/heuristR/articles/archaeology-workflow.html" class="uri">https://center-for-archaeology-and-society.github.io/heuristR/articles/archaeology-workflow.html</a>
+</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="project-status">Project Status<a class="anchor" aria-label="anchor" href="#project-status"></a>
 </h2>
 <p>The package includes permanent unit and live integration tests covering:</p>
 <ul>
