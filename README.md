@@ -17,14 +17,38 @@ It provides:
 devtools::load_all("heuristR")
 ```
 
+## Local Configuration
+
+For local development and live integration tests, create a `.Renviron` file in
+the project root. The real `.Renviron` is ignored by git; only
+`.Renviron.example` should be committed.
+
+Example:
+
+```bash
+cp .Renviron.example .Renviron
+```
+
+Then edit `.Renviron` with your own values:
+
+```bash
+HEURISTR_TEST_BASE_URL=https://your-heurist-host.example/heurist
+HEURISTR_TEST_DB=your_database_name
+HEURIST_USERNAME=your_username
+HEURIST_PASSWORD=your_password
+```
+
+When you run R from the package directory, `heuristR`'s live tests will pick up
+that local `.Renviron` automatically.
+
 ## Quick Start
 
 ```r
 library(heuristR)
 
 session <- heurist_session(
-  base_url = "https://heurist.huma-num.fr/h7-alpha",
-  database = "rbisc_dissertation"
+  base_url = Sys.getenv("HEURISTR_TEST_BASE_URL"),
+  database = Sys.getenv("HEURISTR_TEST_DB")
 )
 
 session <- heurist_login(

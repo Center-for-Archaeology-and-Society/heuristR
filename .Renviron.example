@@ -1,0 +1,4 @@
+HEURISTR_TEST_BASE_URL=https://your-heurist-host.example/heurist
+HEURISTR_TEST_DB=your_database_name
+HEURIST_USERNAME=your_username
+HEURIST_PASSWORD=your_password

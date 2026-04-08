@@ -2,38 +2,43 @@
   if (is.null(x) || length(x) == 0) y else x
 }
 
+.heurist_find_file_upwards <- function(filename, start = getwd()) {
+  current <- normalizePath(start, winslash = "/", mustWork = FALSE)
+
+  repeat {
+    candidate <- file.path(current, filename)
+    if (file.exists(candidate)) {
+      return(candidate)
+    }
+
+    parent <- dirname(current)
+    if (identical(parent, current)) {
+      return(NULL)
+    }
+    current <- parent
+  }
+}
+
+.heurist_load_local_renviron <- function() {
+  renviron <- .heurist_find_file_upwards(".Renviron")
+  if (!is.null(renviron)) {
+    readRenviron(renviron)
+  }
+  invisible(renviron)
+}
+
 heurist_test_config <- function() {
+  .heurist_load_local_renviron()
   list(
-    base_url = Sys.getenv("HEURISTR_TEST_BASE_URL", "https://heurist.huma-num.fr/h7-alpha"),
-    database = Sys.getenv("HEURISTR_TEST_DB", "rbisc_dissertation"),
-    env_file = Sys.getenv("HEURISTR_TEST_ENV_FILE", "/mnt/storage/Web/CAS/.heurist.huma.env")
+    base_url = Sys.getenv("HEURISTR_TEST_BASE_URL", ""),
+    database = Sys.getenv("HEURISTR_TEST_DB", "")
   )
 }
 
-heurist_read_env_file <- function(path) {
-  if (!file.exists(path)) {
-    return(list())
-  }
-
-  lines <- readLines(path, warn = FALSE)
-  out <- list()
-  for (line in lines) {
-    line <- trimws(line)
-    if (line == "" || startsWith(line, "#") || !grepl("=", line, fixed = TRUE)) {
-      next
-    }
-    parts <- strsplit(line, "=", fixed = TRUE)[[1]]
-    out[[trimws(parts[1])]] <- trimws(paste(parts[-1], collapse = "="))
-  }
-  out
-}
-
 heurist_live_credentials <- function() {
-  cfg <- heurist_test_config()
-  env <- heurist_read_env_file(cfg$env_file)
-
-  username <- Sys.getenv("HEURIST_USERNAME", env$USERNAME %||% "")
-  password <- Sys.getenv("HEURIST_PASSWORD", env$PASSWORD %||% "")
+  .heurist_load_local_renviron()
+  username <- Sys.getenv("HEURIST_USERNAME", "")
+  password <- Sys.getenv("HEURIST_PASSWORD", "")
 
   list(
     username = username,
@@ -43,10 +48,14 @@ heurist_live_credentials <- function() {
 }
 
 skip_if_no_live_heurist <- function() {
+  cfg <- heurist_test_config()
   creds <- heurist_live_credentials()
   testthat::skip_if_not(
-    creds$available,
-    message = "Live Heurist credentials not available for integration tests."
+    creds$available && nzchar(cfg$base_url) && nzchar(cfg$database),
+    message = paste(
+      "Live Heurist integration tests require HEURISTR_TEST_BASE_URL,",
+      "HEURISTR_TEST_DB, HEURIST_USERNAME, and HEURIST_PASSWORD."
+    )
   )
 }
 
