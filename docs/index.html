@@ -60,6 +60,14 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p><code>heuristR</code> provides a practical R interface for working with Heurist databases from scripts, analysis workflows, and repeatable data-management tasks. It is designed to make authentication, metadata inspection, record retrieval, and safe scripted updates easier to manage from R.</p>
+<p>The package is especially useful when you want to move beyond manual work in the Heurist web interface and begin building reproducible R workflows for:</p>
+<ul>
+<li>metadata inspection and schema exploration</li>
+<li>record retrieval for analysis or reporting</li>
+<li>controlled creation of new records</li>
+<li>safer scripted updates that avoid destructive partial saves</li>
+<li>reversible data maintenance with rollback support</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="what-is-heurist">What Is Heurist?<a class="anchor" aria-label="anchor" href="#what-is-heurist"></a>
@@ -79,6 +87,7 @@
 <li>safe write helpers built around read-modify-write</li>
 <li>rollback helpers for reversible scripted changes</li>
 </ul>
+<p>Most users will spend most of their time with the higher-level helpers such as <code><a href="reference/heurist_login.html">heurist_login()</a></code>, <code><a href="reference/heurist_rectypes.html">heurist_rectypes()</a></code>, <code><a href="reference/heurist_find_records.html">heurist_find_records()</a></code>, <code><a href="reference/heurist_get_record.html">heurist_get_record()</a></code>, <code><a href="reference/heurist_create_record.html">heurist_create_record()</a></code>, and <code><a href="reference/heurist_patch_record.html">heurist_patch_record()</a></code>. The low-level wrappers are still available when you need to inspect or debug the raw Heurist payloads.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -90,11 +99,14 @@
 <p>During development from a local checkout:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">load_all</a></span><span class="op">(</span><span class="st">"heuristR"</span><span class="op">)</span></span></code></pre></div>
+<p>After installation, load the package as usual:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Center-for-Archaeology-and-Society/heuristR" class="external-link">heuristR</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="create-your-own-heurist-database">Create Your Own Heurist Database<a class="anchor" aria-label="anchor" href="#create-your-own-heurist-database"></a>
 </h2>
-<p>The easiest public starting point appears to be the Huma-Num hosted service:</p>
+<p>The easiest public starting point is the Huma-Num hosted service:</p>
 <ol style="list-style-type: decimal">
 <li>Visit <a href="https://heurist.huma-num.fr/heurist/startup/" class="external-link">heurist.huma-num.fr/heurist/startup/</a>.</li>
 <li>Register as a new user, or log in if you already have an account on that server.</li>
@@ -106,21 +118,48 @@
 <div class="section level2">
 <h2 id="local-configuration">Local Configuration<a class="anchor" aria-label="anchor" href="#local-configuration"></a>
 </h2>
-<p>For local development and live integration tests, create a <code>.Renviron</code> file in the project root. The real <code>.Renviron</code> is ignored by git; only <code>.Renviron.example</code> should be committed.</p>
+<p>For local development and live integration tests, create a <code>.Renviron</code> file in the project root. Do not commit your own <code>.Renviron</code> file or any file that contains live credentials to a git repository.</p>
 <p>Example:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">cp</span> .Renviron.example .Renviron</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">cp</span> .Renviron.example .Renviron</span></code></pre></div>
 <p>Then edit <code>.Renviron</code> with your own values:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="va">HEURISTR_TEST_BASE_URL</span><span class="op">=</span>https://your-heurist-host.example/heurist</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="va">HEURISTR_TEST_DB</span><span class="op">=</span>your_database_name</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="va">HEURIST_USERNAME</span><span class="op">=</span>your_username</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="va">HEURIST_PASSWORD</span><span class="op">=</span>your_password</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="va">HEURISTR_TEST_BASE_URL</span><span class="op">=</span>https://your-heurist-host.example/heurist</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="va">HEURISTR_TEST_DB</span><span class="op">=</span>your_database_name</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="va">HEURIST_USERNAME</span><span class="op">=</span>your_username</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="va">HEURIST_PASSWORD</span><span class="op">=</span>your_password</span></code></pre></div>
 <p>When you run R from the package directory, <code>heuristR</code>’s live tests will pick up that local <code>.Renviron</code> automatically.</p>
+</div>
+<div class="section level2">
+<h2 id="authentication-and-sessions">Authentication and Sessions<a class="anchor" aria-label="anchor" href="#authentication-and-sessions"></a>
+</h2>
+<p><code>heuristR</code> separates session creation from login:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code><a href="reference/heurist_session.html">heurist_session()</a></code> creates a client object with the base URL, database name, timeout, and cookie storage.</li>
+<li>
+<code><a href="reference/heurist_login.html">heurist_login()</a></code> uses that client to authenticate and retain the returned session cookies.</li>
+</ol>
+<p>That separation keeps configuration distinct from authentication and makes it possible to construct a session object before logging in.</p>
+<p>A typical setup looks like this:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Center-for-Archaeology-and-Society/heuristR" class="external-link">heuristR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">session</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_session.html">heurist_session</a></span><span class="op">(</span></span>
+<span>  base_url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"HEURISTR_TEST_BASE_URL"</span><span class="op">)</span>,</span>
+<span>  database <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"HEURISTR_TEST_DB"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">session</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_login.html">heurist_login</a></span><span class="op">(</span></span>
+<span>  <span class="va">session</span>,</span>
+<span>  username <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"HEURIST_USERNAME"</span><span class="op">)</span>,</span>
+<span>  password <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"HEURIST_PASSWORD"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>If you prefer a more compact mental model, you can think of this as “create the client, then authenticate the client.”</p>
 </div>
 <div class="section level2">
 <h2 id="basic-workflow">Basic Workflow<a class="anchor" aria-label="anchor" href="#basic-workflow"></a>
 </h2>
 <p>A typical <code>heuristR</code> session looks like this:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Center-for-Archaeology-and-Society/heuristR" class="external-link">heuristR</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">session</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_session.html">heurist_session</a></span><span class="op">(</span></span>
@@ -137,13 +176,94 @@
 <span><span class="va">rectypes</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_rectypes.html">heurist_rectypes</a></span><span class="op">(</span><span class="va">session</span><span class="op">)</span></span>
 <span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_get_record.html">heurist_get_record</a></span><span class="op">(</span><span class="va">session</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p>From there you can inspect structure with <code><a href="reference/heurist_fields.html">heurist_fields()</a></code> and <code><a href="reference/heurist_structure.html">heurist_structure()</a></code>, search records with <code><a href="reference/heurist_find_records.html">heurist_find_records()</a></code>, and use the higher-level write helpers when you need controlled updates.</p>
+<p>The examples below are illustrative and may need to be adapted to your own Heurist database structure, record types, field IDs, and permissions.</p>
+</div>
+<div class="section level2">
+<h2 id="inspect-database-structure">Inspect Database Structure<a class="anchor" aria-label="anchor" href="#inspect-database-structure"></a>
+</h2>
+<p>Before writing automation against a Heurist database, it is usually helpful to inspect the available record types and field definitions.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rectypes</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_rectypes.html">heurist_rectypes</a></span><span class="op">(</span><span class="va">session</span><span class="op">)</span></span>
+<span><span class="va">fields</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_fields.html">heurist_fields</a></span><span class="op">(</span><span class="va">session</span><span class="op">)</span></span>
+<span><span class="va">structure</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_structure.html">heurist_structure</a></span><span class="op">(</span><span class="va">session</span><span class="op">)</span></span></code></pre></div>
+<p>Typical use cases include:</p>
+<ul>
+<li>finding the exact name of a record type such as <code>Place</code> or <code>Site</code>
+</li>
+<li>locating the numeric field ID for a pointer field or title field</li>
+<li>understanding how a project database models people, places, objects, or events</li>
+</ul>
+<p>If you need direct access to the underlying structure response, use the lower-level metadata wrapper:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">raw_structure</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_raw_entity.html">heurist_raw_entity</a></span><span class="op">(</span></span>
+<span>  <span class="va">session</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a <span class="op">=</span> <span class="st">"structure"</span>, entity <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="read-records">Read Records<a class="anchor" aria-label="anchor" href="#read-records"></a>
+</h2>
+<p>There are two common read patterns: fetch a known record by ID, or search for a set of records.</p>
+<p>Fetch a single record:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_get_record.html">heurist_get_record</a></span><span class="op">(</span><span class="va">session</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<p>Search for records using Heurist query syntax:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sites</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_find_records.html">heurist_find_records</a></span><span class="op">(</span></span>
+<span>  <span class="va">session</span>,</span>
+<span>  q <span class="op">=</span> <span class="st">"t:Site sortby:-m"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Another example using a fictional thematic query:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">late_sites</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_find_records.html">heurist_find_records</a></span><span class="op">(</span></span>
+<span>  <span class="va">session</span>,</span>
+<span>  q <span class="op">=</span> <span class="st">'t:Site "Late Archaic" sortby:-m'</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>If you want the raw endpoint response rather than the higher-level parsed helper:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">raw_records</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_raw_record_output.html">heurist_raw_record_output</a></span><span class="op">(</span></span>
+<span>  <span class="va">session</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q <span class="op">=</span> <span class="st">"t:Site"</span>, format <span class="op">=</span> <span class="st">"json"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="create-records">Create Records<a class="anchor" aria-label="anchor" href="#create-records"></a>
+</h2>
+<p>New records can be created with <code><a href="reference/heurist_create_record.html">heurist_create_record()</a></code>. For example, the following illustrative example creates a fictional <code>Place</code> record:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">change_create</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_create_record.html">heurist_create_record</a></span><span class="op">(</span></span>
+<span>  <span class="va">session</span>,</span>
+<span>  rectype <span class="op">=</span> <span class="st">"Place"</span>,</span>
+<span>  details <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"0"</span> <span class="op">=</span> <span class="st">"North Ridge Wash"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The returned object is a <code>heurist_change</code>, which includes enough information to support rollback later if needed.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">new_record_id</span> <span class="op">&lt;-</span> <span class="va">change_create</span><span class="op">$</span><span class="va">record_id</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="update-records-safely">Update Records Safely<a class="anchor" aria-label="anchor" href="#update-records-safely"></a>
+</h2>
+<p>Direct Heurist save operations can be destructive if you send incomplete payloads. <code>heuristR</code> avoids that by using a read-modify-write approach in <code><a href="reference/heurist_patch_record.html">heurist_patch_record()</a></code>.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">change_patch</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_patch_record.html">heurist_patch_record</a></span><span class="op">(</span></span>
+<span>  <span class="va">session</span>,</span>
+<span>  record_id <span class="op">=</span> <span class="fl">42</span>,</span>
+<span>  details <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"0"</span> <span class="op">=</span> <span class="st">"Updated Site Title"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  mode <span class="op">=</span> <span class="st">"replace"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>This helper first fetches the existing record, merges your requested change in R, and then submits a full replacement payload back to Heurist.</p>
 </div>
 <div class="section level2">
 <h2 id="safe-writes">Safe Writes<a class="anchor" aria-label="anchor" href="#safe-writes"></a>
 </h2>
 <p><code>heuristR</code> avoids partial destructive saves by default. High-level helpers such as <code><a href="reference/heurist_patch_record.html">heurist_patch_record()</a></code> fetch the current record, merge the requested changes client-side, and send back a full record payload.</p>
 <p>Each write returns a <code>heurist_change</code> object that can be rolled back with <code><a href="reference/heurist_restore_change.html">heurist_restore_change()</a></code> or <code><a href="reference/heurist_rollback.html">heurist_rollback()</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">change</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_patch_record.html">heurist_patch_record</a></span><span class="op">(</span></span>
 <span>  <span class="va">session</span>,</span>
 <span>  record_id <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -152,6 +272,64 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/heurist_rollback.html">heurist_rollback</a></span><span class="op">(</span><span class="va">change</span><span class="op">)</span></span></code></pre></div>
+<p>If you need a full explicit replacement rather than a merge-style patch, use <code><a href="reference/heurist_replace_record.html">heurist_replace_record()</a></code>.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">change_replace</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_replace_record.html">heurist_replace_record</a></span><span class="op">(</span></span>
+<span>  <span class="va">session</span>,</span>
+<span>  record_id <span class="op">=</span> <span class="fl">42</span>,</span>
+<span>  details <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"0"</span> <span class="op">=</span> <span class="st">"Replacement title"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="link-related-records">Link Related Records<a class="anchor" aria-label="anchor" href="#link-related-records"></a>
+</h2>
+<p>Heurist databases often use resource pointer fields to connect records. For that case, <code><a href="reference/heurist_link_record.html">heurist_link_record()</a></code> provides a clearer workflow than manually constructing all the detail payloads yourself.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">change_link</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_link_record.html">heurist_link_record</a></span><span class="op">(</span></span>
+<span>  <span class="va">session</span>,</span>
+<span>  record_id <span class="op">=</span> <span class="fl">108</span>,</span>
+<span>  field_id <span class="op">=</span> <span class="fl">1108</span>,</span>
+<span>  target_record_id <span class="op">=</span> <span class="fl">42</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>That pattern is useful for examples such as:</p>
+<ul>
+<li>linking an object to a place</li>
+<li>linking a person to an organization</li>
+<li>linking a site to a locality or region record</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="rollback-and-reversible-workflows">Rollback and Reversible Workflows<a class="anchor" aria-label="anchor" href="#rollback-and-reversible-workflows"></a>
+</h2>
+<p>One of the most useful features of <code>heuristR</code> is that the high-level write helpers return change objects that can be undone.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/heurist_rollback.html">heurist_rollback</a></span><span class="op">(</span><span class="va">change_create</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/heurist_rollback.html">heurist_rollback</a></span><span class="op">(</span><span class="va">change_patch</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/heurist_rollback.html">heurist_rollback</a></span><span class="op">(</span><span class="va">change_link</span><span class="op">)</span></span></code></pre></div>
+<p>This is especially helpful when you are:</p>
+<ul>
+<li>testing a script against a staging database</li>
+<li>validating field mappings</li>
+<li>prototyping a cleanup or migration workflow</li>
+<li>making scripted edits you may need to reverse quickly</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="low-level-endpoint-access">Low-Level Endpoint Access<a class="anchor" aria-label="anchor" href="#low-level-endpoint-access"></a>
+</h2>
+<p>If you need raw access to the underlying Heurist controllers, the package also provides low-level wrappers.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">raw_read</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_raw_record_output.html">heurist_raw_record_output</a></span><span class="op">(</span><span class="va">session</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>q <span class="op">=</span> <span class="st">"t:Site"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">raw_edit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_raw_record_edit.html">heurist_raw_record_edit</a></span><span class="op">(</span><span class="va">session</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a <span class="op">=</span> <span class="st">"delete"</span>, ids <span class="op">=</span> <span class="st">"9999"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">raw_meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/heurist_raw_entity.html">heurist_raw_entity</a></span><span class="op">(</span><span class="va">session</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a <span class="op">=</span> <span class="st">"structure"</span>, entity <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>These are helpful for:</p>
+<ul>
+<li>debugging request payloads</li>
+<li>inspecting server responses directly</li>
+<li>prototyping new higher-level helpers</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
