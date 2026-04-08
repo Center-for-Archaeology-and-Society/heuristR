@@ -1,0 +1,30 @@
+Package: heuristR
+Title: R Client for Heurist Databases
+Version: 0.0.0.9000
+Authors@R: c(
+    person(
+      given = "Robert J.",
+      family = "Bischoff",
+      email = "rbischoff@asu.edu",
+      role = c("aut", "cre")
+    )
+  )
+Description: Provides a session-oriented R client for working with Heurist
+    databases. The package wraps Heurist authentication, metadata, and record
+    retrieval endpoints and establishes a foundation for safe record creation
+    and update workflows.
+License: MIT + file LICENSE
+URL: https://heurist.huma-num.fr/heurist/
+BugReports: https://heurist.huma-num.fr/heurist/
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    cli,
+    httr2,
+    jsonlite
+Suggests:
+    pkgload,
+    processx,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
