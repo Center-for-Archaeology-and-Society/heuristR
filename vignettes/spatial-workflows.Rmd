@@ -1,0 +1,185 @@
+---
+title: "Spatial Data Workflows"
+output:
+  rmarkdown::html_vignette: default
+  rmarkdown::pdf_document: default
+vignette: >
+  %\VignetteIndexEntry{Spatial Data Workflows}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[UTF-8]{inputenc}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+`heuristR` can return Heurist records as `sf` objects when the source records
+contain geometry or coordinate data. This makes it possible to use standard R
+spatial tools for filtering, plotting, export, and interactive map display.
+
+The examples in this vignette are intentionally illustrative. They show the
+intended workflow, but the exact record types, field names, and query strings
+will vary across Heurist databases.
+
+## When to use spatial output
+
+Use `as_sf = TRUE` when you want to:
+
+- map Heurist records in R
+- filter records spatially with `sf`
+- export Heurist geometry to GeoJSON or other GIS formats
+- visualize records in `leaflet` or `mapview`
+
+If a record includes spatial geometry, `heuristR` will try to convert that
+geometry to an `sf` object. If `sf` is not installed and spatial data are
+returned, the package will warn rather than silently discarding that fact.
+
+## Connect to a Heurist database
+
+```{r eval = FALSE}
+library(heuristR)
+
+session <- heurist_session(
+  base_url = "https://heurist.example.org/heurist",
+  database = "demo_desert_survey"
+)
+
+session <- heurist_login(
+  session,
+  username = "field_director",
+  password = Sys.getenv("HEURIST_PASSWORD")
+)
+```
+
+## Return records as sf
+
+Suppose the database contains a `Site` record type with mapped locations. You
+can request those records directly as an `sf` object:
+
+```{r eval = FALSE}
+sites_sf <- heurist_find_records(
+  session,
+  q = "t:Site",
+  as_sf = TRUE
+)
+```
+
+For a single record:
+
+```{r eval = FALSE}
+site_sf <- heurist_get_record(
+  session,
+  record_id = 42,
+  as_sf = TRUE
+)
+```
+
+The resulting object can then be used with standard `sf` functions:
+
+```{r eval = FALSE}
+class(sites_sf)
+sf::st_geometry_type(sites_sf)
+sf::st_crs(sites_sf)
+```
+
+## Inspect and clean geometry
+
+Not every record in a real database will necessarily have valid or non-empty
+geometry. A common first step is to isolate the features you can map.
+
+```{r eval = FALSE}
+sites_sf <- sites_sf[!sf::st_is_empty(sites_sf), ]
+sites_sf <- sf::st_transform(sites_sf, 4326)
+```
+
+You can also look at the number of empty or valid geometries:
+
+```{r eval = FALSE}
+sum(sf::st_is_empty(sites_sf))
+all(sf::st_is_valid(sites_sf))
+```
+
+## Make a leaflet map
+
+If you want an interactive web map in R, `leaflet` is a natural fit:
+
+```{r eval = FALSE}
+library(leaflet)
+
+leaflet(sites_sf) |>
+  addProviderTiles(providers$CartoDB.Positron) |>
+  addCircleMarkers(
+    radius = 4,
+    weight = 1,
+    color = "#212529",
+    fillColor = "#0d6efd",
+    fillOpacity = 0.75,
+    popup = ~rec_Title
+  )
+```
+
+For polygon or mixed geometry data, `addPolygons()` or `addGeoJSON()` may be a
+better fit than `addCircleMarkers()`.
+
+## Make a quick map with mapview
+
+For exploratory work, `mapview` can be even faster:
+
+```{r eval = FALSE}
+library(mapview)
+
+mapview(sites_sf, zcol = "rec_Title")
+```
+
+This is a convenient option when you want a quick map to inspect what came back
+from the database before building a more polished `leaflet` visualization.
+
+## Filter spatial records before mapping
+
+Once records are in `sf` format, you can use spatial operations directly.
+
+Example: select only records within a bounding box:
+
+```{r eval = FALSE}
+bbox <- sf::st_as_sfc(
+  sf::st_bbox(c(xmin = -111, ymin = 35, xmax = -109, ymax = 36), crs = 4326)
+)
+
+sites_in_bbox <- sites_sf[sf::st_intersects(sites_sf, bbox, sparse = FALSE), ]
+```
+
+Or clip to a study area polygon:
+
+```{r eval = FALSE}
+study_area <- sf::st_read("study-area.geojson")
+sites_clipped <- sf::st_intersection(sites_sf, study_area)
+```
+
+## Export spatial data
+
+Because the result is a normal `sf` object, export is straightforward:
+
+```{r eval = FALSE}
+sf::st_write(sites_sf, "sites.geojson", driver = "GeoJSON")
+sf::st_write(sites_sf, "sites.gpkg", driver = "GPKG")
+```
+
+That makes it easy to move data from Heurist into GIS workflows in QGIS, ArcGIS,
+or other R-based spatial analysis pipelines.
+
+## Typical workflow
+
+A common spatial workflow with `heuristR` looks like this:
+
+1. log in with `heurist_session()` and `heurist_login()`
+2. query a spatial record set with `heurist_find_records(..., as_sf = TRUE)`
+3. remove empty geometries and transform CRS if needed
+4. inspect or filter the result with `sf`
+5. visualize it with `leaflet` or `mapview`
+6. export to GeoJSON or another GIS-friendly format if needed
+
+This pattern works well for archaeology, environmental history, cultural
+heritage, and other spatially oriented research projects built in Heurist.

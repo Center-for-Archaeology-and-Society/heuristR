@@ -4,13 +4,15 @@
 #'
 #' @param session A `heurist_session`.
 #' @param record_id Numeric or character record ID.
+#' @param as_sf If `TRUE`, return an `sf` object when possible.
+#' @param crs Coordinate reference system to use when `as_sf = TRUE`.
 #'
-#' @return A parsed Heurist record payload.
+#' @return A parsed Heurist record payload, or an `sf` object if `as_sf = TRUE`.
 #' @export
-heurist_get_record <- function(session, record_id) {
+heurist_get_record <- function(session, record_id, as_sf = FALSE, crs = 4326) {
   stopifnot(inherits(session, "heurist_session"))
 
-  heurist_raw_record_output(
+  payload <- heurist_raw_record_output(
     session,
     query = list(
       recID = as.character(record_id),
@@ -18,6 +20,13 @@ heurist_get_record <- function(session, record_id) {
       restapi = 1
     )
   )
+
+  if (isTRUE(as_sf)) {
+    return(.heurist_payload_to_sf(payload, crs = crs))
+  }
+
+  .heurist_warn_missing_sf(payload)
+  payload
 }
 
 #' Find Heurist Records
@@ -27,14 +36,16 @@ heurist_get_record <- function(session, record_id) {
 #' @param session A `heurist_session`.
 #' @param q Heurist query string, such as `"t:10"` or `"sortby:-m"`.
 #' @param format Response format. Defaults to `"json"`.
+#' @param as_sf If `TRUE`, return an `sf` object when possible.
+#' @param crs Coordinate reference system to use when `as_sf = TRUE`.
 #'
-#' @return A parsed Heurist record payload.
+#' @return A parsed Heurist record payload, or an `sf` object if `as_sf = TRUE`.
 #' @export
-heurist_find_records <- function(session, q, format = "json") {
+heurist_find_records <- function(session, q, format = "json", as_sf = FALSE, crs = 4326) {
   stopifnot(inherits(session, "heurist_session"))
   stopifnot(is.character(q), length(q) == 1, nzchar(q))
 
-  heurist_raw_record_output(
+  payload <- heurist_raw_record_output(
     session,
     query = list(
       q = q,
@@ -42,6 +53,13 @@ heurist_find_records <- function(session, q, format = "json") {
       restapi = 1
     )
   )
+
+  if (isTRUE(as_sf)) {
+    return(.heurist_payload_to_sf(payload, crs = crs))
+  }
+
+  .heurist_warn_missing_sf(payload)
+  payload
 }
 
 #' Call Heurist Record Output Directly

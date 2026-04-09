@@ -4,15 +4,19 @@
 \alias{heurist_get_record}
 \title{Get a Single Heurist Record}
 \usage{
-heurist_get_record(session, record_id)
+heurist_get_record(session, record_id, as_sf = FALSE, crs = 4326)
 }
 \arguments{
 \item{session}{A \code{heurist_session}.}
 
 \item{record_id}{Numeric or character record ID.}
+
+\item{as_sf}{If \code{TRUE}, return an \code{sf} object when possible.}
+
+\item{crs}{Coordinate reference system to use when \code{as_sf = TRUE}.}
 }
 \value{
-A parsed Heurist record payload.
+A parsed Heurist record payload, or an \code{sf} object if \code{as_sf = TRUE}.
 }
 \description{
 Fetches one record by record ID.

@@ -4,3 +4,5 @@
 
 - [Research Workflow Example:
   Archaeology](https://center-for-archaeology-and-society.github.io/heuristR/articles/archaeology-workflow.md):
+- [Spatial Data
+  Workflows](https://center-for-archaeology-and-society.github.io/heuristR/articles/spatial-workflows.md):

@@ -4,7 +4,7 @@
 \alias{heurist_find_records}
 \title{Find Heurist Records}
 \usage{
-heurist_find_records(session, q, format = "json")
+heurist_find_records(session, q, format = "json", as_sf = FALSE, crs = 4326)
 }
 \arguments{
 \item{session}{A \code{heurist_session}.}
@@ -12,9 +12,13 @@ heurist_find_records(session, q, format = "json")
 \item{q}{Heurist query string, such as \code{"t:10"} or \code{"sortby:-m"}.}
 
 \item{format}{Response format. Defaults to \code{"json"}.}
+
+\item{as_sf}{If \code{TRUE}, return an \code{sf} object when possible.}
+
+\item{crs}{Coordinate reference system to use when \code{as_sf = TRUE}.}
 }
 \value{
-A parsed Heurist record payload.
+A parsed Heurist record payload, or an \code{sf} object if \code{as_sf = TRUE}.
 }
 \description{
 Queries records using a raw Heurist query string.

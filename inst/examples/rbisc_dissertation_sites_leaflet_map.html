@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>rbisc_dissertation Site Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+      body { margin: 0; font-family: sans-serif; background: #f8f9fa; color: #212529; }
+      .wrap { padding: 16px; }
+      h1 { margin: 0 0 8px; font-size: 1.4rem; }
+      p { margin: 0 0 12px; }
+      #map { height: calc(100vh - 170px); min-height: 520px; border: 1px solid #ced4da; background: #ffffff; }
+      .note { color: #495057; font-size: 0.95rem; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>rbisc_dissertation Site Map</h1>
+      <p>Generated from Heurist database <strong>rbisc_dissertation</strong>. Showing 800 site records with spatial geometry.</p>
+      <p class="note">This local HTML version intentionally omits a remote basemap so it works when opened directly from disk. Open the companion widget file or serve this directory over HTTP if you want a tiled basemap.</p>
+      <div id="map"></div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      const map = L.map("map", { preferCanvas: true });
+      const bounds = [[33.446396, -112.198278], [37.909709, -107.570355]];
+      map.fitBounds(bounds, { padding: [20, 20] });
+
+      fetch("rbisc_dissertation_sites.geojson")
+        .then((response) => response.json())
+        .then((data) => {
+          const layer = L.geoJSON(data, {
+            pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+              radius: 4,
+              weight: 1,
+              color: "#212529",
+              fillColor: "#0d6efd",
+              fillOpacity: 0.75
+            }),
+            onEachFeature: (feature, layer) => {
+              const props = feature.properties || {};
+              const title = props.rec_Title || props.rec_ID || "Untitled record";
+              const id = props.rec_ID ? `<div><strong>ID:</strong> ${props.rec_ID}</div>` : "";
+              layer.bindPopup(`<strong>${title}</strong>${id}`);
+            }
+          }).addTo(map);
+
+          if (layer.getBounds().isValid()) {
+            map.fitBounds(layer.getBounds(), { padding: [20, 20] });
+          }
+        });
+    </script>
+  </body>
+</html>

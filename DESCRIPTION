@@ -28,10 +28,13 @@ Imports:
     jsonlite
 Suggests:
     knitr,
+    leaflet,
+    mapview,
     pkgdown,
     pkgload,
     processx,
     rmarkdown,
+    sf,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

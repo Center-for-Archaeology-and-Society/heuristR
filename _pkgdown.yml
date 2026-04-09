@@ -22,6 +22,8 @@ navbar:
       menu:
       - text: Research Workflow Example
         href: articles/archaeology-workflow.html
+      - text: Spatial Data Workflows
+        href: articles/spatial-workflows.html
       - text: Vignette PDF
         href: articles/archaeology-workflow.pdf
     news:
@@ -65,3 +67,4 @@ articles:
   navbar: Workflow Guides
   contents:
   - archaeology-workflow
+  - spatial-workflows

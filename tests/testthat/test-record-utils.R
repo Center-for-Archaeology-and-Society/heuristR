@@ -50,3 +50,88 @@ test_that("record normalization keeps header values and details", {
   expect_equal(normalized$rectype_id, "91")
   expect_equal(normalized$details[["1"]][["3"]], "42SA920")
 })
+
+test_that("WKT is extracted from Heurist geo detail payloads", {
+  record <- list(
+    rec_ID = "1",
+    details = list(
+      "1096" = list(
+        "0" = list(
+          geo = list(
+            type = "p",
+            wkt = "POINT(-110.1 35.2)"
+          )
+        )
+      )
+    )
+  )
+
+  expect_equal(
+    heuristR:::.heurist_extract_wkt(record),
+    "POINT(-110.1 35.2)"
+  )
+})
+
+test_that("payloads can be converted to sf objects when sf is available", {
+  testthat::skip_if_not_installed("sf")
+
+  payload <- list(
+    records = list(
+      list(
+        rec_ID = "1",
+        rec_RecTypeID = "91",
+        rec_Title = "Example Site",
+        rec_Modified = "2026-04-08 00:00:00",
+        rec_Added = "2026-04-08 00:00:00",
+        rec_URL = NULL,
+        details = list(
+          "1096" = list(
+            "0" = list(
+              geo = list(
+                type = "p",
+                wkt = "POINT(-110.1 35.2)"
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+
+  spatial <- heuristR:::.heurist_payload_to_sf(payload)
+
+  expect_s3_class(spatial, "sf")
+  expect_equal(nrow(spatial), 1)
+  expect_equal(as.character(sf::st_geometry_type(spatial)[1]), "POINT")
+  expect_equal(spatial$rec_Title[[1]], "Example Site")
+})
+
+test_that("spatial payloads warn when sf is unavailable", {
+  payload <- list(
+    records = list(
+      list(
+        rec_ID = "1",
+        details = list(
+          "1096" = list(
+            "0" = list(
+              geo = list(
+                type = "p",
+                wkt = "POINT(-110.1 35.2)"
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+
+  testthat::local_mocked_bindings(
+    .heurist_has_sf = function() FALSE,
+    .package = "heuristR"
+  )
+
+  expect_warning(
+    heuristR:::.heurist_warn_missing_sf(payload),
+    "Spatial data were returned by Heurist"
+  )
+})

@@ -5,7 +5,7 @@ Queries records using a raw Heurist query string.
 ## Usage
 
 ``` r
-heurist_find_records(session, q, format = "json")
+heurist_find_records(session, q, format = "json", as_sf = FALSE, crs = 4326)
 ```
 
 ## Arguments
@@ -22,6 +22,14 @@ heurist_find_records(session, q, format = "json")
 
   Response format. Defaults to `"json"`.
 
+- as_sf:
+
+  If `TRUE`, return an `sf` object when possible.
+
+- crs:
+
+  Coordinate reference system to use when `as_sf = TRUE`.
+
 ## Value
 
-A parsed Heurist record payload.
+A parsed Heurist record payload, or an `sf` object if `as_sf = TRUE`.

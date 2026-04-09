@@ -20,6 +20,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-vignettes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Vignettes</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-vignettes"><li><a class="dropdown-item" href="../articles/archaeology-workflow.html">Research Workflow Example</a></li>
+    <li><a class="dropdown-item" href="../articles/spatial-workflows.html">Spatial Data Workflows</a></li>
     <li><a class="dropdown-item" href="../articles/archaeology-workflow.pdf">Vignette PDF</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Release Notes</a></li>
@@ -43,7 +44,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">heurist_get_record</span><span class="op">(</span><span class="va">session</span>, <span class="va">record_id</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">heurist_get_record</span><span class="op">(</span><span class="va">session</span>, <span class="va">record_id</span>, as_sf <span class="op">=</span> <span class="cn">FALSE</span>, crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -57,10 +58,18 @@
 <dt id="arg-record-id">record_id<a class="anchor" aria-label="anchor" href="#arg-record-id"></a></dt>
 <dd><p>Numeric or character record ID.</p></dd>
 
+
+<dt id="arg-as-sf">as_sf<a class="anchor" aria-label="anchor" href="#arg-as-sf"></a></dt>
+<dd><p>If <code>TRUE</code>, return an <code>sf</code> object when possible.</p></dd>
+
+
+<dt id="arg-crs">crs<a class="anchor" aria-label="anchor" href="#arg-crs"></a></dt>
+<dd><p>Coordinate reference system to use when <code>as_sf = TRUE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A parsed Heurist record payload.</p>
+    <p>A parsed Heurist record payload, or an <code>sf</code> object if <code>as_sf = TRUE</code>.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

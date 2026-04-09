@@ -231,3 +231,130 @@
   stopifnot(is.list(details))
   jsonlite::toJSON(details, auto_unbox = TRUE)
 }
+
+.heurist_has_sf <- function() {
+  requireNamespace("sf", quietly = TRUE)
+}
+
+.heurist_extract_wkt <- function(record) {
+  details <- record$details %||% list()
+
+  for (field_entries in details) {
+    if (!is.list(field_entries)) {
+      next
+    }
+
+    for (entry in field_entries) {
+      if (is.list(entry) && !is.null(entry$geo$wkt) && nzchar(entry$geo$wkt %||% "")) {
+        return(as.character(entry$geo$wkt))
+      }
+    }
+  }
+
+  lon <- .heurist_extract_scalar_detail(record, "1094")
+  lat <- .heurist_extract_scalar_detail(record, "1095")
+  if (!is.null(lon) && !is.null(lat)) {
+    lon_num <- suppressWarnings(as.numeric(lon))
+    lat_num <- suppressWarnings(as.numeric(lat))
+    if (!is.na(lon_num) && !is.na(lat_num)) {
+      return(sprintf("POINT(%s %s)", lon, lat))
+    }
+  }
+
+  NULL
+}
+
+.heurist_extract_scalar_detail <- function(record, detail_type_id) {
+  entries <- record$details[[as.character(detail_type_id)]] %||% NULL
+  if (is.null(entries) || !length(entries)) {
+    return(NULL)
+  }
+
+  value <- entries[[1]]
+  if (is.atomic(value) && length(value) == 1) {
+    return(as.character(value))
+  }
+
+  NULL
+}
+
+.heurist_record_has_spatial <- function(record) {
+  !is.null(.heurist_extract_wkt(record))
+}
+
+.heurist_payload_has_spatial <- function(payload) {
+  records <- payload$records %||% list()
+  any(vapply(records, .heurist_record_has_spatial, logical(1)))
+}
+
+.heurist_warn_missing_sf <- function(payload) {
+  if (.heurist_payload_has_spatial(payload) && !.heurist_has_sf()) {
+    cli::cli_warn(c(
+      "Spatial data were returned by Heurist.",
+      "i" = "Install the {.pkg sf} package or set {.code as_sf = FALSE} explicitly if you only need the raw record payload."
+    ))
+  }
+}
+
+.heurist_payload_to_sf <- function(payload, crs = 4326) {
+  if (!.heurist_has_sf()) {
+    cli::cli_abort(c(
+      "Spatial conversion requires the {.pkg sf} package.",
+      "i" = "Install {.pkg sf} to use {.code as_sf = TRUE}."
+    ))
+  }
+
+  records <- payload$records %||% list()
+  rows <- lapply(records, function(record) {
+    list(
+      rec_ID = as.character(record$rec_ID %||% ""),
+      rec_RecTypeID = as.character(record$rec_RecTypeID %||% ""),
+      rec_Title = as.character(record$rec_Title %||% ""),
+      rec_Modified = as.character(record$rec_Modified %||% ""),
+      rec_Added = as.character(record$rec_Added %||% ""),
+      rec_URL = .heurist_nullable_scalar(record$rec_URL),
+      details = list(record$details %||% list()),
+      record = list(record),
+      wkt = .heurist_extract_wkt(record) %||% NA_character_
+    )
+  })
+
+  df <- if (length(rows)) {
+    do.call(
+      rbind,
+      lapply(rows, function(row) {
+        data.frame(
+          rec_ID = row$rec_ID,
+          rec_RecTypeID = row$rec_RecTypeID,
+          rec_Title = row$rec_Title,
+          rec_Modified = row$rec_Modified,
+          rec_Added = row$rec_Added,
+          rec_URL = row$rec_URL %||% NA_character_,
+          wkt = row$wkt,
+          stringsAsFactors = FALSE
+        )
+      })
+    )
+  } else {
+    data.frame(
+      rec_ID = character(),
+      rec_RecTypeID = character(),
+      rec_Title = character(),
+      rec_Modified = character(),
+      rec_Added = character(),
+      rec_URL = character(),
+      wkt = character(),
+      stringsAsFactors = FALSE
+    )
+  }
+
+  df$details <- I(lapply(rows, `[[`, "details"))
+  df$record <- I(lapply(rows, `[[`, "record"))
+
+  wkts <- df$wkt
+  wkts[is.na(wkts) | !nzchar(wkts)] <- "GEOMETRYCOLLECTION EMPTY"
+  geometry <- sf::st_as_sfc(wkts, crs = crs)
+  out <- sf::st_sf(df[setdiff(names(df), "wkt")], geometry = geometry, crs = crs)
+  attr(out, "heurist_payload") <- payload
+  out
+}

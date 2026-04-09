@@ -9,6 +9,8 @@ rather than relying on destructive partial save calls.
 
 Useful links:
 
+- <https://center-for-archaeology-and-society.github.io/heuristR/>
+
 - <https://github.com/Center-for-Archaeology-and-Society/heuristR>
 
 - <https://heuristnetwork.org/>
