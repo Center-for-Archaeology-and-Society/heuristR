@@ -10,6 +10,23 @@ test_that("existing Heurist details normalize safely", {
   expect_equal(normalized[["238"]][["834266"]], "53501")
 })
 
+test_that("existing geospatial details normalize to WKT safely", {
+  details <- list(
+    "28" = list(
+      "1576558" = list(
+        geo = list(
+          type = "p",
+          wkt = "POINT(-107.9618 36.06054)"
+        )
+      )
+    )
+  )
+
+  normalized <- heuristR:::.heurist_normalize_existing_details(details)
+
+  expect_equal(normalized[["28"]][["1576558"]], "POINT(-107.9618 36.06054)")
+})
+
 test_that("detail merge replaces or appends as expected", {
   existing <- list(
     "1" = list("3" = "42SA920"),
