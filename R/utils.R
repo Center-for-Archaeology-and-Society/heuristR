@@ -136,6 +136,8 @@
 
     if (is.list(value) && !is.null(value$id)) {
       normalized[[entry_name]] <- as.character(value$id)
+    } else if (is.list(value) && !is.null(value$geo) && !is.null(value$geo$wkt)) {
+      normalized[[entry_name]] <- as.character(value$geo$wkt)
     } else if (is.atomic(value) && length(value) == 1) {
       normalized[[entry_name]] <- as.character(value)
     } else if (is.list(value) && length(value) == 0) {
