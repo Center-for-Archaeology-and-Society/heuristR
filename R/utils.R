@@ -37,6 +37,60 @@
   .heurist_check_response(resp)
 }
 
+.heurist_post <- function(session, path, body = list()) {
+  req <- .heurist_request(session, path)
+
+  if (length(body) > 0) {
+    encoded <- .heurist_encode_form_body(body)
+    req <- do.call(httr2::req_body_form, c(list(req), encoded))
+  }
+
+  resp <- httr2::req_perform(req)
+  .heurist_check_response(resp)
+}
+
+.heurist_encode_form_body <- function(x, prefix = NULL) {
+  if (is.null(x)) {
+    return(list())
+  }
+
+  if (is.atomic(x) && length(x) == 1) {
+    stopifnot(!is.null(prefix), nzchar(prefix))
+    return(stats::setNames(list(as.character(x)), prefix))
+  }
+
+  if (!is.list(x)) {
+    stopifnot(!is.null(prefix), nzchar(prefix))
+    return(stats::setNames(list(as.character(x)), prefix))
+  }
+
+  out <- list()
+  item_names <- names(x)
+  if (is.null(item_names)) {
+    item_names <- as.character(seq_along(x) - 1L)
+  } else {
+    empty_names <- which(!nzchar(item_names))
+    if (length(empty_names) > 0) {
+      item_names[empty_names] <- as.character(empty_names - 1L)
+    }
+  }
+
+  for (idx in seq_along(x)) {
+    item <- x[[idx]]
+    item_name <- item_names[[idx]]
+    next_prefix <- if (is.null(prefix)) {
+      item_name
+    } else {
+      sprintf("%s[%s]", prefix, item_name)
+    }
+
+    encoded <- .heurist_encode_form_body(item, prefix = next_prefix)
+    out <- c(out, encoded)
+  }
+
+  out
+}
+
 .heurist_check_response <- function(resp) {
   status <- httr2::resp_status(resp)
 

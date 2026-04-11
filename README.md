@@ -43,6 +43,7 @@ The package includes:
 - low-level wrappers around core Heurist endpoints
 - high-level read helpers
 - safe write helpers built around read-modify-write
+- guarded schema-creation helpers for key Heurist definition entities
 - rollback helpers for reversible scripted changes
 
 Most users will spend most of their time with the higher-level helpers such as
@@ -50,6 +51,11 @@ Most users will spend most of their time with the higher-level helpers such as
 `heurist_get_record()`, `heurist_create_record()`, and
 `heurist_patch_record()`. The low-level wrappers are still available when you
 need to inspect or debug the raw Heurist payloads.
+
+For schema work, the package now separates low-level write access from
+high-level convenience helpers. The exported schema helpers are create-only by
+default so that an underspecified request cannot silently overwrite an existing
+record type, field type, term, or record-structure row.
 
 ## Installation
 
